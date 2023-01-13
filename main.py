@@ -65,13 +65,7 @@ def draw_grid(grid, tile_size, gap_size, screen):
 
 
 def breath_first_search(grid):
-    pygame.time.wait(100)
-    # value_map = {1: "B", 2: "W", 0: "W", 3: "R", 4: "P"}
-    # print("-----")
-    # for row in grid:
-    #     print([value_map[val] for _, _, val in row])
 
-    
     value_map = {1: "#", 2: " ", 0: " ", 3: "X", 4: "O"}
     print("-----")
     test = []
@@ -86,6 +80,7 @@ def breath_first_search(grid):
     for row in test:
         print(row)
 
+    # solves the maze and returns an array with the path
     result = bfs(test)
 
     for row in result:
