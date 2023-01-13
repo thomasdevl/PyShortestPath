@@ -1,4 +1,6 @@
 import pygame
+import sys
+from bfs import bfs
 
 def create_grid(rows, columns, tile_size, gap_size, x, y):
     grid = []
@@ -55,20 +57,48 @@ def draw_grid(grid, tile_size, gap_size, screen):
                 color = (255, 0, 0)
             elif value == 4: # start purple can't be moved 
                 color = (196, 48, 226)
+            elif value == 5: # path green
+                color = (0, 255, 0)
             pygame.draw.rect(screen, color, [x, y, tile_size, tile_size])
 
 
-def print_grid(grid):
-    value_map = {1: "B", 2: "W", 0: "W", 3: "R", 4: "P"}
+
+
+def breath_first_search(grid):
+    pygame.time.wait(100)
+    # value_map = {1: "B", 2: "W", 0: "W", 3: "R", 4: "P"}
+    # print("-----")
+    # for row in grid:
+    #     print([value_map[val] for _, _, val in row])
+
+    
+    value_map = {1: "#", 2: " ", 0: " ", 3: "X", 4: "O"}
     print("-----")
+    test = []
     for row in grid:
-        print([value_map[val] for _, _, val in row])
+        # print([value_map[val] for _, _, val in row])
+        test.append([value_map[val] for _, _, val in row])
 
-    # breath first search
+    # W = " "
+    # B = "#"
+    # P = "O"
+    # R = "X"
+    for row in test:
+        print(row)
 
-    # purple = start
-    # red = end
-    # blue = obstacle
+    result = bfs(test)
+
+    for row in result:
+        print(row)
+
+    for row in range(len(grid)):
+        for column in range(len(grid[0])):
+            x, y, value = grid[row][column]
+            if result[row][column] == "+":
+                grid[row][column] = (x, y, 5)
+
+    return grid
+
 
 
 
@@ -79,7 +109,7 @@ def create_button(text, x, y, width, height, inactive_color, active_color, scree
     if x + width > mouse[0] > x and y + height > mouse[1] > y:
         pygame.draw.rect(screen, active_color, (x, y, width, height))
         if click[0] == 1:
-            print_grid(grid)
+            breath_first_search(grid)
     else:
         pygame.draw.rect(screen, inactive_color, (x, y, width, height))
 
@@ -103,6 +133,11 @@ def main():
     running = True
     event_occurred = False
     while running:
+        # close window
+        # for event in pygame.event.get():
+        #     if event.type == pygame.QUIT:
+        #         running = False
+
         event_occurred = handle_events(grid, 100, 5, screen)
         if event_occurred:
             # Clear the screen
@@ -111,12 +146,14 @@ def main():
             # Draw the grid
             draw_grid(grid, 100, 5, screen)
 
-            #create button
-            create_button("BFS", 50, 10, 100, 50, (0, 0, 255), (0, 0, 255), screen, grid)
+            #create buttons
+            create_button("CLEAR", 50, 10, 100, 50, (255, 0, 0), (0, 0, 255), screen, grid)
+            create_button("BFS", 160, 10, 100, 50, (0, 0, 255), (0, 0, 255), screen, grid)
 
             # Update the display
             pygame.display.flip()
             event_occurred = False
+            
 
     # Quit pygame
     pygame.quit()
