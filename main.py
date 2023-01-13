@@ -65,7 +65,8 @@ def draw_grid(grid, tile_size, gap_size, screen):
 
 
 def breath_first_search(grid):
-
+    pygame.time.wait(100)
+    
     value_map = {1: "#", 2: " ", 0: " ", 3: "X", 4: "O"}
     print("-----")
     test = []
@@ -81,6 +82,7 @@ def breath_first_search(grid):
         print(row)
 
     # solves the maze and returns an array with the path
+    # check bfs.py for more details
     result = bfs(test)
 
     for row in result:
@@ -104,7 +106,15 @@ def create_button(text, x, y, width, height, inactive_color, active_color, scree
     if x + width > mouse[0] > x and y + height > mouse[1] > y:
         pygame.draw.rect(screen, active_color, (x, y, width, height))
         if click[0] == 1:
-            breath_first_search(grid)
+            if text == "CLEAR":
+                for row in range(len(grid)):
+                    for column in range(len(grid[0])):
+                        x, y, value = grid[row][column]
+                        if column == 0 and row == 0:
+                            continue
+                        grid[row][column] = (x, y, 0)
+            elif text == "BFS":
+                breath_first_search(grid)
     else:
         pygame.draw.rect(screen, inactive_color, (x, y, width, height))
 
@@ -142,8 +152,8 @@ def main():
             draw_grid(grid, 100, 5, screen)
 
             #create buttons
-            create_button("CLEAR", 50, 10, 100, 50, (255, 0, 0), (0, 0, 255), screen, grid)
-            create_button("BFS", 160, 10, 100, 50, (0, 0, 255), (0, 0, 255), screen, grid)
+            create_button("CLEAR", 50, 10, 100, 50, (255, 0, 0), (128, 21, 43), screen, grid)
+            create_button("BFS", 160, 10, 100, 50, (0, 0, 255), (15, 27, 131), screen, grid)
 
             # Update the display
             pygame.display.flip()
