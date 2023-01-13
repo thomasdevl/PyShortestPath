@@ -13,6 +13,15 @@ def create_grid(rows, columns, tile_size, gap_size, x, y):
                 grid[row].append((x + column * (tile_size + gap_size), y + row * (tile_size + gap_size), 0))
     return grid
 
+def clear_grid(grid):
+    for row in range(len(grid)):
+        for column in range(len(grid[0])):
+            x, y, value = grid[row][column]
+            if column == 0 and row == 0:
+                continue
+            grid[row][column] = (x, y, 0)
+    return grid
+
 
 def handle_events(grid, tile_size, gap_size, screen):
     pos = pygame.mouse.get_pos()
@@ -107,12 +116,7 @@ def create_button(text, x, y, width, height, inactive_color, active_color, scree
         pygame.draw.rect(screen, active_color, (x, y, width, height))
         if click[0] == 1:
             if text == "CLEAR":
-                for row in range(len(grid)):
-                    for column in range(len(grid[0])):
-                        x, y, value = grid[row][column]
-                        if column == 0 and row == 0:
-                            continue
-                        grid[row][column] = (x, y, 0)
+                clear_grid(grid)
             elif text == "BFS":
                 breath_first_search(grid)
     else:
