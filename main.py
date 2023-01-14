@@ -76,12 +76,19 @@ def draw_grid(grid, tile_size, gap_size, screen):
 def breath_first_search(grid):
     pygame.time.wait(100)
     
-    value_map = {1: "#", 2: " ", 0: " ", 3: "X", 4: "O"}
+    value_map = {1: "#", 2: " ", 0: " ", 3: "X", 4: "O", 5: " "}
     print("-----")
     test = []
     for row in grid:
         # print([value_map[val] for _, _, val in row])
         test.append([value_map[val] for _, _, val in row])
+
+    # remove all the Green
+    for row in range(len(grid)):
+        for column in range(len(grid[0])):
+            x, y, value = grid[row][column]
+            if value == 5:
+                grid[row][column] = (x, y, 0)
 
     # W = " "
     # B = "#"
@@ -142,12 +149,11 @@ def main():
     running = True
     event_occurred = False
     while running:
-        # close window
-        # for event in pygame.event.get():
-        #     if event.type == pygame.QUIT:
-        #         running = False
 
         event_occurred = handle_events(grid, 100, 5, screen)
+        if not event_occurred:
+            running = False
+
         if event_occurred:
             # Clear the screen
             screen.fill((0, 0, 0))
@@ -166,6 +172,7 @@ def main():
 
     # Quit pygame
     pygame.quit()
+    sys.exit()
 
 if __name__ == '__main__':
     main()
