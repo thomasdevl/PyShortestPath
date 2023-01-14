@@ -23,6 +23,16 @@ def clear_grid(grid):
     grid[0][0] = (grid[0][0][0], grid[0][0][1], 4)
     return grid
 
+def clear_gray(grid):
+    for row in range(len(grid)):
+        for column in range(len(grid[0])):
+            x, y, value = grid[row][column]
+            if column == 0 and row == 0:
+                continue
+            if value == 7 or value == 5:
+                grid[row][column] = (x, y, 0)
+    return grid
+
 
 def handle_events(grid, tile_size, gap_size, screen):
     pos = pygame.mouse.get_pos()
@@ -230,10 +240,13 @@ def create_button(text, x, y, width, height, inactive_color, active_color, scree
             if text == "CLEAR":
                 clear_grid(grid)
             elif text == "BFS":
+                clear_gray(grid)
                 breath_first_search(grid, tile_size, gap_size, screen )
             elif text == "DFS":
+                clear_gray(grid)
                 depth_first_search(grid, tile_size, gap_size, screen )
             elif text == "A*":
+                clear_gray(grid)
                 a_star(grid, tile_size, gap_size, screen )
     else:
         pygame.draw.rect(screen, inactive_color, (x, y, width, height))
