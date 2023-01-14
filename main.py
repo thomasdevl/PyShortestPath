@@ -68,54 +68,99 @@ def draw_grid(grid, tile_size, gap_size, screen):
                 color = (196, 48, 226)
             elif value == 5: # path green
                 color = (0, 255, 0)
+            elif value == 6: # searching yellow
+                color = (255, 255, 0)
+            elif value == 7: # checked gray
+                color = (128, 128, 128)
             pygame.draw.rect(screen, color, [x, y, tile_size, tile_size])
 
 
 
+def breath_first_search(grid, tile_size, gap_size, screen):
+    start_x, start_y = 0, 0 # find the start position 
+    queue = [(start_x, start_y, None)]
+    visited = set()
+    path = []
+    goal_reached = False
+    while queue:
+        x, y, parent = queue.pop(0)
+        if (x,y) in visited:
+            continue
+        visited.add((x,y))
+        
+        if grid[x][y][2] == 3:
+            goal_reached = True
+            path.append((x,y))
+            break
 
-def breath_first_search(grid):
-    pygame.time.wait(100)
-    
-    value_map = {1: "#", 2: " ", 0: " ", 3: "X", 4: "O", 5: " "}
-    print("-----")
-    test = []
-    for row in grid:
-        # print([value_map[val] for _, _, val in row])
-        test.append([value_map[val] for _, _, val in row])
+        grid[x][y] = (grid[x][y][0], grid[x][y][1], 6)
+        draw_grid(grid, tile_size, gap_size, screen)
+        pygame.display.update()
+        pygame.time.wait(100)
 
-    # remove all the Green
-    for row in range(len(grid)):
-        for column in range(len(grid[0])):
-            x, y, value = grid[row][column]
-            if value == 5:
-                grid[row][column] = (x, y, 0)
+        #add the neighbors to the queue
+        for dx, dy in [(1,0),(-1,0),(0,1),(0,-1)]:
+            if 0 <= x+dx < len(grid) and 0 <= y+dy < len(grid[0]):
+                if grid[x+dx][y+dy][2] != 1:
+                    queue.append((x+dx,y+dy,(x,y)))
+        grid[x][y] = (grid[x][y][0], grid[x][y][1], 7)
+        draw_grid(grid, tile_size, gap_size, screen)
+        pygame.display.update()
 
-    # W = " "
-    # B = "#"
-    # P = "O"
-    # R = "X"
-    for row in test:
-        print(row)
-
-    # solves the maze and returns an array with the path
-    # check bfs.py for more details
-    result = bfs(test)
-
-    for row in result:
-        print(row)
-
-    for row in range(len(grid)):
-        for column in range(len(grid[0])):
-            x, y, value = grid[row][column]
-            if result[row][column] == "+":
-                grid[row][column] = (x, y, 5)
-
-    return grid
-
+    if goal_reached:
+        for pos in path:
+            x, y = pos
+            grid[x][y] = (grid[x][y][0], grid[x][y][1], 5)
+        draw_grid(grid, tile_size, gap_size, screen)
+        pygame.display.update()
+    return goal_reached
 
 
+def depth_first_search(grid, tile_size, gap_size, screen):
+    start_x, start_y = 0, 0 # find the start position
+    stack = [(start_x, start_y, None)]
+    visited = set()
+    path = []
+    goal_reached = False
+    while stack:
+        x, y, parent = stack.pop()
+        if (x,y) in visited:
+            continue
+        visited.add((x,y))
 
-def create_button(text, x, y, width, height, inactive_color, active_color, screen, grid):
+        if grid[x][y][2] == 3:
+            goal_reached = True
+            path.append((x,y))
+            break
+
+        grid[x][y] = (grid[x][y][0], grid[x][y][1], 6)
+        draw_grid(grid, tile_size, gap_size, screen)
+        pygame.display.update()
+        pygame.time.wait(100)
+
+        #add the neighbors to the stack
+        for dx, dy in [(1,0),(-1,0),(0,1),(0,-1)]:
+            if 0 <= x+dx < len(grid) and 0 <= y+dy < len(grid[0]):
+                if grid[x+dx][y+dy][2] != 1:
+                    stack.append((x+dx,y+dy,(x,y)))
+        grid[x][y] = (grid[x][y][0], grid[x][y][1], 7)
+        draw_grid(grid, tile_size, gap_size, screen)
+        pygame.display.update()
+
+    if goal_reached:
+        for pos in path:
+            x, y = pos
+            grid[x][y] = (grid[x][y][0], grid[x][y][1], 5)
+        draw_grid(grid, tile_size, gap_size, screen)
+        pygame.display.update()
+    return goal_reached
+
+
+
+
+
+
+def create_button(text, x, y, width, height, inactive_color, active_color, screen, grid, tile_size, gap_size):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
@@ -125,7 +170,9 @@ def create_button(text, x, y, width, height, inactive_color, active_color, scree
             if text == "CLEAR":
                 clear_grid(grid)
             elif text == "BFS":
-                breath_first_search(grid)
+                breath_first_search(grid, tile_size, gap_size, screen )
+            elif text == "DFS":
+                depth_first_search(grid, tile_size, gap_size, screen )
     else:
         pygame.draw.rect(screen, inactive_color, (x, y, width, height))
 
@@ -140,7 +187,8 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((800, 600))
     pygame.display.set_caption("Python Pathfinding")
-
+    clock = pygame.time.Clock()
+    
     # Create a grid
     grid = create_grid(5, 5, 100, 5, 50, 70)
 
@@ -150,6 +198,7 @@ def main():
     event_occurred = False
     while running:
 
+        clock.tick(30)
         event_occurred = handle_events(grid, 100, 5, screen)
         if not event_occurred:
             running = False
@@ -162,8 +211,9 @@ def main():
             draw_grid(grid, 100, 5, screen)
 
             #create buttons
-            create_button("CLEAR", 50, 10, 100, 50, (255, 0, 0), (128, 21, 43), screen, grid)
-            create_button("BFS", 160, 10, 100, 50, (0, 0, 255), (15, 27, 131), screen, grid)
+            create_button("CLEAR", 50, 10, 100, 50, (255, 0, 0), (128, 21, 43), screen, grid, 100, 5)
+            create_button("BFS", 160, 10, 100, 50, (0, 0, 255), (15, 27, 131), screen, grid, 100, 5)
+            create_button("DFS", 270, 10, 100, 50, (0, 0, 255), (15, 27, 131), screen, grid, 100, 5)
 
             # Update the display
             pygame.display.flip()
