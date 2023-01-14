@@ -174,7 +174,15 @@ def heuristic(a, b):
 
 def a_star(grid, tile_size, gap_size, screen):
     start_x, start_y = 0, 0 # find the start position
-    goal_x, goal_y = len(grid) - 1, len(grid[0]) - 1 # find the goal position
+    
+    # check the list for the value 3 and set that as the goal
+    for row in range(len(grid)):
+        for column in range(len(grid[0])):
+            x, y, value = grid[row][column]
+            if value == 3:
+                goal_x, goal_y = row, column
+                break
+   
     heap = [(0, (start_x, start_y))]
     visited = set()
     parent = {}
