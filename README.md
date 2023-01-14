@@ -4,9 +4,9 @@
 - [x] Show grid
 
 Algo :
-- [ ] BFS
-- [ ] DFS
-- [ ] A*
+- [x] BFS
+- [x] DFS
+- [x] A*
 - [ ] ...
 
 Looks
