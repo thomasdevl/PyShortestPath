@@ -244,14 +244,14 @@ def a_star(grid, tile_size, gap_size, screen):
 
 
 class Slider():
-    def __init__(self, x, y, min_val, max_val):
+    def __init__(self, x, y, min_val, start_val, max_val):
         self.x = x
         self.y = y
         self.min_val = min_val
         self.max_val = max_val
         self.width = 150
         self.height = 30
-        self.current_val = min_val
+        self.current_val = start_val
         self.dragging = False
         self.prev_val = min_val  # add a variable to keep track of the previous value
         
@@ -325,7 +325,7 @@ def main():
     clock = pygame.time.Clock()
     font = pygame.font.SysFont(None, 24)  # create a font object
     
-    # Create a grid
+    # Create a grid with default values
     rows = 6
     columns = 8
     tile_size = 100
@@ -334,10 +334,10 @@ def main():
     grid = create_grid(rows, columns, tile_size, gap_size, 50, 70)
 
     # Create an instance of the Slider class
-    slider_rows = Slider(500, 30, 2, 100)
-    slider_columns = Slider(700, 30, 2, 100)
-    slider_tile_size = Slider(900, 30, 10, 100)
-    slider_gap_size = Slider(1100, 30, 0, 10)
+    slider_rows = Slider(500, 30, 2, 6, 100)
+    slider_columns = Slider(700, 30, 2, 8, 100)
+    slider_tile_size = Slider(900, 30, 10, 100, 1000)
+    slider_gap_size = Slider(1100, 30, 1, 5, 1000)
     
     # Create a loop to handle events
     running = True
