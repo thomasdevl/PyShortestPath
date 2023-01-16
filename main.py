@@ -34,9 +34,15 @@ def clear_gray(grid):
     return grid
 
 
-def handle_events(grid, tile_size, gap_size, screen):
+def handle_events(grid, tile_size, gap_size, screen, slider1, slider2):
     pos = pygame.mouse.get_pos()
     for event in pygame.event.get():
+
+        # Pass events to the slider
+        slider1.handle_event(event)
+        slider2.handle_event(event)
+
+
         if event.type == pygame.QUIT:
             return False
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -236,6 +242,51 @@ def a_star(grid, tile_size, gap_size, screen):
     return goal_reached
 
 
+class Slider():
+    def __init__(self, x, y, min_val, max_val):
+        self.x = x
+        self.y = y
+        self.min_val = min_val
+        self.max_val = max_val
+        self.width = 150
+        self.height = 30
+        self.current_val = min_val
+        self.dragging = False
+        self.prev_val = min_val  # add a variable to keep track of the previous value
+        
+    def draw(self, surface):
+        # Draw the slider bar
+        pygame.draw.rect(surface, (255, 255, 255), (self.x, self.y, self.width, self.height))
+        
+        # Draw the slider knob
+        knob_x = self.x + (self.width * ((self.current_val - self.min_val) / (self.max_val - self.min_val)))
+        pygame.draw.circle(surface, (0, 0, 255), (knob_x, self.y + (self.height // 2)), self.height // 2)
+        
+        # Draw the current value on top of the slider
+        font = pygame.font.SysFont(None, 24)
+        text = font.render(str(round(self.current_val)), True, (255, 255, 255))
+        surface.blit(text, (self.x + self.width + 10, self.y))
+        
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                # Check if the click was within the bounds of the slider
+                if self.x <= event.pos[0] <= self.x + self.width and self.y <= event.pos[1] <= self.y + self.height:
+                    self.dragging = True  # set the dragging flag to True
+                    self.update_slider(event.pos)
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1:
+                self.dragging = False  # set the dragging flag to False
+        elif event.type == pygame.MOUSEMOTION:
+            if self.dragging:
+                self.update_slider(event.pos)
+
+    def update_slider(self, pos):
+        pos_x = pos[0]
+        pos_x = max(pos_x, self.x)
+        pos_x = min(pos_x, self.x + self.width)
+        self.current_val = self.min_val + ((pos_x - self.x) / self.width) * (self.max_val - self.min_val)
+        self.current_val = round(self.current_val)
 
 
 def create_button(text, x, y, width, height, inactive_color, active_color, screen, grid, tile_size, gap_size):
@@ -271,10 +322,19 @@ def main():
     screen = pygame.display.set_mode((1280,720))
     pygame.display.set_caption("Python Pathfinding")
     clock = pygame.time.Clock()
+    font = pygame.font.SysFont(None, 24)  # create a font object
     
     # Create a grid
-    grid = create_grid(6, 8, 100, 5, 50, 70)
+    rows = 6
+    columns = 8
+    tile_size = 100
+    gap_size = 5
 
+    grid = create_grid(rows, columns, tile_size, gap_size, 50, 70)
+
+    # Create an instance of the Slider class
+    slider_rows = Slider(500, 30, 2, 100)
+    slider_columns = Slider(700, 30, 2, 100)
     
     # Create a loop to handle events
     running = True
@@ -282,13 +342,34 @@ def main():
     while running:
 
         clock.tick(30)
-        event_occurred = handle_events(grid, 100, 5, screen)
+        event_occurred = handle_events(grid, 100, 5, screen, slider_rows, slider_columns)
+
         if not event_occurred:
             running = False
 
         if event_occurred:
             # Clear the screen
             screen.fill((0, 0, 0))
+
+            # Draw the sliders
+            text = font.render("Number of Rows", True, (255, 255, 255))  # render the text
+            screen.blit(text, (500, 10))  # draw the text on the screen
+            slider_rows.draw(screen)
+            text = font.render("Number of Columns", True, (255, 255, 255))  # render the text
+            screen.blit(text, (700, 10))  # draw the text on the screen
+            slider_columns.draw(screen)
+
+            # Update the grid if the slider values have changed
+            if slider_rows.prev_val != slider_rows.current_val or slider_columns.prev_val != slider_columns.current_val:
+                slider_rows.prev_val = slider_rows.current_val
+                slider_columns.prev_val = slider_columns.current_val
+                
+                rows = slider_rows.current_val
+                columns = slider_columns.current_val
+                tile_size = 100
+                gap_size = 5
+
+                grid = create_grid(rows, columns, tile_size, gap_size, 50, 70)
 
             # Draw the grid
             draw_grid(grid, 100, 5, screen)
@@ -299,6 +380,7 @@ def main():
             create_button("DFS", 270, 10, 100, 50, (0, 0, 255), (15, 27, 131), screen, grid, 100, 5)
             create_button("A*", 380, 10, 100, 50, (0, 0, 255), (15, 27, 131), screen, grid, 100, 5)
 
+            
             # Update the display
             pygame.display.flip()
             event_occurred = False
