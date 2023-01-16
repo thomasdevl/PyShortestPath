@@ -34,14 +34,15 @@ def clear_gray(grid):
     return grid
 
 
-def handle_events(grid, tile_size, gap_size, screen, slider1, slider2):
+def handle_events(grid, tile_size, gap_size, screen, slider1, slider2, slider3, slider4):
     pos = pygame.mouse.get_pos()
     for event in pygame.event.get():
 
         # Pass events to the slider
         slider1.handle_event(event)
         slider2.handle_event(event)
-
+        slider3.handle_event(event)
+        slider4.handle_event(event)
 
         if event.type == pygame.QUIT:
             return False
@@ -335,6 +336,8 @@ def main():
     # Create an instance of the Slider class
     slider_rows = Slider(500, 30, 2, 100)
     slider_columns = Slider(700, 30, 2, 100)
+    slider_tile_size = Slider(900, 30, 10, 100)
+    slider_gap_size = Slider(1100, 30, 0, 10)
     
     # Create a loop to handle events
     running = True
@@ -342,7 +345,7 @@ def main():
     while running:
 
         clock.tick(30)
-        event_occurred = handle_events(grid, 100, 5, screen, slider_rows, slider_columns)
+        event_occurred = handle_events(grid, 100, 5, screen, slider_rows, slider_columns, slider_tile_size, slider_gap_size)
 
         if not event_occurred:
             running = False
@@ -352,22 +355,30 @@ def main():
             screen.fill((0, 0, 0))
 
             # Draw the sliders
-            text = font.render("Number of Rows", True, (255, 255, 255))  # render the text
-            screen.blit(text, (500, 10))  # draw the text on the screen
+            text = font.render("Number of Rows", True, (255, 255, 255))  
+            screen.blit(text, (500, 10))  
             slider_rows.draw(screen)
-            text = font.render("Number of Columns", True, (255, 255, 255))  # render the text
-            screen.blit(text, (700, 10))  # draw the text on the screen
+            text = font.render("Number of Columns", True, (255, 255, 255))  
+            screen.blit(text, (700, 10))  
             slider_columns.draw(screen)
+            text = font.render("Tile Size", True, (255, 255, 255))  
+            screen.blit(text, (900, 10))  
+            slider_tile_size.draw(screen)
+            text = font.render("Gap Size", True, (255, 255, 255)) 
+            screen.blit(text, (1100, 10)) 
+            slider_gap_size.draw(screen)
 
             # Update the grid if the slider values have changed
-            if slider_rows.prev_val != slider_rows.current_val or slider_columns.prev_val != slider_columns.current_val:
+            if slider_rows.prev_val != slider_rows.current_val or slider_columns.prev_val != slider_columns.current_val or slider_tile_size.prev_val != slider_tile_size.current_val or slider_gap_size.prev_val != slider_gap_size.current_val:
                 slider_rows.prev_val = slider_rows.current_val
                 slider_columns.prev_val = slider_columns.current_val
-                
+                slider_tile_size.prev_val = slider_tile_size.current_val
+                slider_gap_size.prev_val = slider_gap_size.current_val
+
                 rows = slider_rows.current_val
                 columns = slider_columns.current_val
-                tile_size = 100
-                gap_size = 5
+                tile_size = slider_tile_size.current_val
+                gap_size = slider_gap_size.current_val
 
                 grid = create_grid(rows, columns, tile_size, gap_size, 50, 70)
 
