@@ -4,10 +4,12 @@
 - [x] Show grid
 
 Algo :
-- [x] BFS
-- [x] DFS
+- [x] BFS *
+- [x] DFS *
 - [x] A*
-- [ ] ...
+
+*Needs fixing
+
 
 Looks
 - [ ] add a timer when launching algo
