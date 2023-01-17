@@ -12,6 +12,5 @@ Algo :
 
 
 Looks
-- [ ] add a timer when launching algo
-- [ ] add custom grid size
+- [ ] add custom grid size | NEEDS FIXING 
 - [ ] show clearly how to use 
